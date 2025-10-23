@@ -3,39 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Are you a Noakhaila?</title>
+  <title>Noakhaila Survey Quiz</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
       background: #f0f0f0;
-      margin: 0;
-      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
     .quiz-container {
       background: #fff;
-      border-radius: 10px;
-      padding: 30px 20px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      padding: 30px 25px;
       width: 100%;
       max-width: 450px;
       text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     .progress-bar {
       width: 100%;
       height: 12px;
       background: #ddd;
       border-radius: 6px;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
     .progress {
       height: 100%;
       background: #4caf50;
       border-radius: 6px;
-      width: 0;
+      width: 0%;
       transition: width 0.3s ease;
     }
     .question {
@@ -45,7 +44,7 @@
     .answers button {
       width: 100%;
       padding: 12px;
-      margin: 8px 0;
+      margin: 6px 0;
       background: #4caf50;
       border: none;
       border-radius: 6px;
@@ -71,42 +70,44 @@
     </div>
     <div class="question">Loading...</div>
     <div class="answers">
-      <button onclick="nextQuestion(0)">Answer 1</button>
-      <button onclick="nextQuestion(1)">Answer 2</button>
-      <button onclick="nextQuestion(2)">Answer 3</button>
+      <button>Answer 1</button>
+      <button>Answer 2</button>
+      <button>Answer 3</button>
     </div>
   </div>
 
   <script>
+    // Survey questions with weighted values
     const questions = [
-      { question: "Do you consider yourself a Noakhaila?", answers: ["Absolutely", "Not at all", "Sometimes"], correct: 0 },
-      { question: "Is panta bhat your favorite dish?", answers: ["Yes", "No", "What's that?"], correct: 0 },
-      { question: "Do you greet with 'Assalamu Alaikum'?", answers: ["Always", "Never", "Only on Fridays"], correct: 0 },
-      { question: "Is hilsa your go-to fish?", answers: ["Of course", "Nope", "I prefer chicken"], correct: 0 },
-      { question: "Do you say 'bujhsi' often?", answers: ["All the time", "Rarely", "Never heard of it"], correct: 0 },
-      { question: "Do you enjoy local festivals?", answers: ["Yes, all of them!", "Sometimes", "Never"], correct: 0 },
-      { question: "Do you talk about your hometown a lot?", answers: ["Always", "Sometimes", "Never"], correct: 0 },
-      { question: "Do you love spicy food?", answers: ["Yes", "No", "Depends"], correct: 0 },
-      { question: "Do you speak in Noakhali dialect often?", answers: ["All the time", "Rarely", "Never"], correct: 0 },
-      { question: "Are you proud to be a Noakhaila?", answers: ["Absolutely", "Not really", "Sometimes"], correct: 0 }
+      {question:"Do you consider yourself a Noakhaila?", answers:[{text:"Absolutely", value:10},{text:"Sometimes", value:5},{text:"Not at all", value:0}]},
+      {question:"Is panta bhat your favorite dish?", answers:[{text:"Yes", value:10},{text:"Sometimes", value:5},{text:"What's that?", value:0}]},
+      {question:"Do you greet with 'Assalamu Alaikum'?", answers:[{text:"Always", value:10},{text:"Sometimes", value:5},{text:"Never", value:0}]},
+      {question:"Is hilsa your go-to fish?", answers:[{text:"Of course", value:10},{text:"Sometimes", value:5},{text:"Never", value:0}]},
+      {question:"Do you say 'bujhsi' often?", answers:[{text:"All the time", value:10},{text:"Rarely", value:5},{text:"Never", value:0}]},
+      {question:"Do you enjoy local festivals?", answers:[{text:"Yes, all of them!", value:10},{text:"Sometimes", value:5},{text:"Never", value:0}]},
+      {question:"Do you talk about your hometown a lot?", answers:[{text:"Always", value:10},{text:"Sometimes", value:5},{text:"Never", value:0}]},
+      {question:"Do you love spicy food?", answers:[{text:"Yes", value:10},{text:"Sometimes", value:5},{text:"Not really", value:0}]},
+      {question:"Do you speak in Noakhali dialect often?", answers:[{text:"All the time", value:10},{text:"Sometimes", value:5},{text:"Never", value:0}]},
+      {question:"Are you proud to be a Noakhaila?", answers:[{text:"Absolutely", value:10},{text:"Sometimes", value:5},{text:"Not really", value:0}]}
     ];
 
-    let currentQuestion = 0;
+    let current = 0;
     let score = 0;
+    const maxScore = questions.length * 10;
 
     function updateProgress() {
-      const progress = ((currentQuestion) / questions.length) * 100;
-      document.querySelector('.progress').style.width = progress + '%';
+      const percent = ((current) / questions.length) * 100;
+      document.querySelector('.progress').style.width = percent + '%';
     }
 
     function loadQuestion() {
-      if (currentQuestion < questions.length) {
-        const q = questions[currentQuestion];
+      if(current < questions.length){
+        const q = questions[current];
         document.querySelector('.question').textContent = q.question;
         const buttons = document.querySelectorAll('.answers button');
-        buttons.forEach((button, index) => {
-          button.textContent = q.answers[index];
-          button.onclick = () => nextQuestion(index);
+        buttons.forEach((btn,index)=>{
+          btn.textContent = q.answers[index].text;
+          btn.onclick = () => nextQuestion(index);
         });
         updateProgress();
       } else {
@@ -115,19 +116,27 @@
     }
 
     function nextQuestion(selected) {
-      if (selected === questions[currentQuestion].correct) {
-        score++;
-      }
-      currentQuestion++;
+      score += questions[current].answers[selected].value;
+      current++;
       loadQuestion();
     }
 
     function showResult() {
-      const percent = Math.round((score / questions.length) * 100);
+      // Base percentage
+      let percent = Math.round((score / maxScore) * 100);
+
+      // Random boost to make 70-100% more likely
+      const rand = Math.random() * 100;
+      if(rand < 50 && percent < 70){
+        percent = 70 + Math.floor(Math.random()*31); // 70-100%
+      }
+
       let message = "";
-      if (percent === 100) message = "Perfect Noakhaila!";
-      else if (percent >= 50) message = "Pretty Noakhaila!";
+      if(percent >= 90) message = "Perfect Noakhaila!";
+      else if(percent >= 70) message = "Pretty Noakhaila!";
+      else if(percent >= 50) message = "Halfway there!";
       else message = "Better luck next time!";
+
       document.querySelector('.quiz-container').innerHTML = `
         <div class="result">You ${percent}% Noakhaila!<br>${message}</div>
       `;
@@ -136,4 +145,4 @@
     loadQuestion();
   </script>
 </body>
-</html>
+  </html>
