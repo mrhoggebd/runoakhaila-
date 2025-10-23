@@ -2,118 +2,138 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Noakhaila Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Are you a Noakhaila?</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #ff9966, #ff5e62);
-      color: #fff;
+      font-family: 'Arial', sans-serif;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 0;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0;
-    }
-    h1 {
-      text-align: center;
-      font-size: 2.5rem;
-      margin-bottom: 2rem;
-      text-shadow: 2px 2px #000;
     }
     .quiz-container {
-      background: rgba(0,0,0,0.4);
-      padding: 30px 50px;
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      background: #fff;
+      border-radius: 10px;
+      padding: 30px 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 450px;
       text-align: center;
     }
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: #ddd;
+      border-radius: 6px;
+      margin-bottom: 25px;
+    }
+    .progress {
+      height: 100%;
+      background: #4caf50;
+      border-radius: 6px;
+      width: 0;
+      transition: width 0.3s ease;
+    }
     .question {
-      font-size: 1.3rem;
-      margin-bottom: 1.5rem;
+      font-size: 20px;
+      margin-bottom: 20px;
     }
-    button {
-      padding: 10px 25px;
-      margin: 10px;
+    .answers button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      background: #4caf50;
       border: none;
-      border-radius: 15px;
-      font-size: 1rem;
+      border-radius: 6px;
+      color: white;
+      font-size: 16px;
       cursor: pointer;
-      background: #fff;
-      color: #ff5e62;
+      transition: background 0.3s;
+    }
+    .answers button:hover {
+      background: #45a049;
+    }
+    .result {
+      font-size: 22px;
       font-weight: bold;
-      transition: 0.3s;
-    }
-    button:hover {
-      background: #ff5e62;
-      color: #fff;
-    }
-    #result {
-      display: none;
-      font-size: 2rem;
-      margin-top: 2rem;
-      text-shadow: 2px 2px #000;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h1>Are You Noakhaila? 🤔</h1>
-  <div class="quiz-container" id="quiz">
-    <div class="question" id="question"></div>
-    <div>
-      <button onclick="nextQuestion()">Yes</button>
-      <button onclick="nextQuestion()">No</button>
-      <button onclick="nextQuestion()">Sometimes</button>
+  <div class="quiz-container">
+    <div class="progress-bar">
+      <div class="progress"></div>
+    </div>
+    <div class="question">Loading...</div>
+    <div class="answers">
+      <button onclick="nextQuestion(0)">Answer 1</button>
+      <button onclick="nextQuestion(1)">Answer 2</button>
+      <button onclick="nextQuestion(2)">Answer 3</button>
     </div>
   </div>
 
-  <div id="result"></div>
-
   <script>
-    const quizData = [
-      "Do you love spicy food?",
-      "Do you speak with a Noakhali accent?",
-      "Do you enjoy panta bhat?",
-      "Do you say 'bujhsi' a lot?",
-      "Do you enjoy river fishing?",
-      "Do you watch local Noakhali festivals?",
-      "Do you greet with 'assalamu alaikum' first?",
-      "Do you love hilsa fish?",
-      "Do you say 'kemon aso' a lot?",
-      "Do you like talking about your hometown?"
+    const questions = [
+      { question: "Do you consider yourself a Noakhaila?", answers: ["Absolutely", "Not at all", "Sometimes"], correct: 0 },
+      { question: "Is panta bhat your favorite dish?", answers: ["Yes", "No", "What's that?"], correct: 0 },
+      { question: "Do you greet with 'Assalamu Alaikum'?", answers: ["Always", "Never", "Only on Fridays"], correct: 0 },
+      { question: "Is hilsa your go-to fish?", answers: ["Of course", "Nope", "I prefer chicken"], correct: 0 },
+      { question: "Do you say 'bujhsi' often?", answers: ["All the time", "Rarely", "Never heard of it"], correct: 0 },
+      { question: "Do you enjoy local festivals?", answers: ["Yes, all of them!", "Sometimes", "Never"], correct: 0 },
+      { question: "Do you talk about your hometown a lot?", answers: ["Always", "Sometimes", "Never"], correct: 0 },
+      { question: "Do you love spicy food?", answers: ["Yes", "No", "Depends"], correct: 0 },
+      { question: "Do you speak in Noakhali dialect often?", answers: ["All the time", "Rarely", "Never"], correct: 0 },
+      { question: "Are you proud to be a Noakhaila?", answers: ["Absolutely", "Not really", "Sometimes"], correct: 0 }
     ];
 
-    let current = 0;
+    let currentQuestion = 0;
+    let score = 0;
 
-    function loadQuestion() {
-      document.getElementById("question").innerText = quizData[current];
+    function updateProgress() {
+      const progress = ((currentQuestion) / questions.length) * 100;
+      document.querySelector('.progress').style.width = progress + '%';
     }
 
-    function nextQuestion() {
-      current++;
-      if(current < quizData.length){
-        loadQuestion();
+    function loadQuestion() {
+      if (currentQuestion < questions.length) {
+        const q = questions[currentQuestion];
+        document.querySelector('.question').textContent = q.question;
+        const buttons = document.querySelectorAll('.answers button');
+        buttons.forEach((button, index) => {
+          button.textContent = q.answers[index];
+          button.onclick = () => nextQuestion(index);
+        });
+        updateProgress();
       } else {
         showResult();
       }
     }
 
+    function nextQuestion(selected) {
+      if (selected === questions[currentQuestion].correct) {
+        score++;
+      }
+      currentQuestion++;
+      loadQuestion();
+    }
+
     function showResult() {
-      document.getElementById("quiz").style.display = "none";
-
-      // Random percentage based on given probabilities
-      let rand = Math.random() * 100;
-      let percent;
-      if(rand <= 4.4) percent = Math.floor(Math.random()*11); // 0-10%
-      else if(rand <= 15) percent = Math.floor(Math.random() * 38) + 10; // 10-47%
-      else if(rand <= 53) percent = Math.floor(Math.random() * 13) + 48; // 48-60%
-      else percent = Math.floor(Math.random() * 40) + 61; // 61-100%
-
-      document.getElementById("result").innerText = `You ${percent}% Noakhaila! 🎉`;
-      document.getElementById("result").style.display = "block";
+      const percent = Math.round((score / questions.length) * 100);
+      let message = "";
+      if (percent === 100) message = "Perfect Noakhaila!";
+      else if (percent >= 50) message = "Pretty Noakhaila!";
+      else message = "Better luck next time!";
+      document.querySelector('.quiz-container').innerHTML = `
+        <div class="result">You ${percent}% Noakhaila!<br>${message}</div>
+      `;
     }
 
     loadQuestion();
   </script>
 </body>
-  </html>
+</html>
