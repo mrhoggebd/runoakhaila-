@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Noakhaila Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #ff9966, #ff5e62);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      text-shadow: 2px 2px #000;
+    }
+    .quiz-container {
+      background: rgba(0,0,0,0.4);
+      padding: 30px 50px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    .question {
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+    }
+    button {
+      padding: 10px 25px;
+      margin: 10px;
+      border: none;
+      border-radius: 15px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: #fff;
+      color: #ff5e62;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #ff5e62;
+      color: #fff;
+    }
+    #result {
+      display: none;
+      font-size: 2rem;
+      margin-top: 2rem;
+      text-shadow: 2px 2px #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>Are You Noakhaila? 🤔</h1>
+  <div class="quiz-container" id="quiz">
+    <div class="question" id="question"></div>
+    <div>
+      <button onclick="nextQuestion()">Yes</button>
+      <button onclick="nextQuestion()">No</button>
+      <button onclick="nextQuestion()">Sometimes</button>
+    </div>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    const quizData = [
+      "Do you love spicy food?",
+      "Do you speak with a Noakhali accent?",
+      "Do you enjoy panta bhat?",
+      "Do you say 'bujhsi' a lot?",
+      "Do you enjoy river fishing?",
+      "Do you watch local Noakhali festivals?",
+      "Do you greet with 'assalamu alaikum' first?",
+      "Do you love hilsa fish?",
+      "Do you say 'kemon aso' a lot?",
+      "Do you like talking about your hometown?"
+    ];
+
+    let current = 0;
+
+    function loadQuestion() {
+      document.getElementById("question").innerText = quizData[current];
+    }
+
+    function nextQuestion() {
+      current++;
+      if(current < quizData.length){
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      document.getElementById("quiz").style.display = "none";
+
+      // Random percentage based on given probabilities
+      let rand = Math.random() * 100;
+      let percent;
+      if(rand <= 4.4) percent = Math.floor(Math.random()*11); // 0-10%
+      else if(rand <= 15) percent = Math.floor(Math.random() * 38) + 10; // 10-47%
+      else if(rand <= 53) percent = Math.floor(Math.random() * 13) + 48; // 48-60%
+      else percent = Math.floor(Math.random() * 40) + 61; // 61-100%
+
+      document.getElementById("result").innerText = `You ${percent}% Noakhaila! 🎉`;
+      document.getElementById("result").style.display = "block";
+    }
+
+    loadQuestion();
+  </script>
+</body>
+  </html>
